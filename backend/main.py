@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, Query, HTTPException
 from sqlmodel import SQLModel, Session, select
 from database import engine
-from models import TODOCreate, TODOPublic, TODO
+from models import TODOCreate, TODOPublic, TODO, TODOUpdate
 from typing import Annotated
 from sqlalchemy import func
 
@@ -65,3 +65,16 @@ def read_todo(todo_id: int, session: SessionDep):
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
     return todo
+
+@app.patch("/todos/{todo_id}", response_model=TODOPublic)
+def update_todo(todo_id: int, todo: TODOUpdate, session: SessionDep):
+    # Update an TODO with new data
+    todo_db = session.get(TODO, todo_id)
+    if not todo_db:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    todo_data = todo.model_dump(exclude_unset=True)
+    todo_db.sqlmodel_update(todo_data)
+    session.add(todo_db)
+    session.commit()
+    session.refresh(todo_db)
+    return todo_db
