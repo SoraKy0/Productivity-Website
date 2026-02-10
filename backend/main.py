@@ -32,14 +32,14 @@ app = FastAPI(lifespan=lifespan)
 
 
 # Create a new TODO item in the database and return the saved record
-@app.post("/todos/", response_model=TODOPublic)
+@app.post("/todos/", response_model=TODOPublic, status_code=201)
 def create_todo(todo: TODOCreate, session: SessionDep):
     db_todo = TODO.model_validate(todo)
     # Count todos
     statement = select(func.count()).select_from(TODO)
     total = session.exec(statement).one()
-    if total >= 100:
-        raise HTTPException(status_code=400, detail="Hey You! Finish your TODO before making more!")
+    if total >= 50:
+        raise HTTPException(status_code=403, detail="Hey You! Finish your TODO before making more!")
 
     session.add(db_todo)
     session.commit()
