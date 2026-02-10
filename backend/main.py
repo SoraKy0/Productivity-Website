@@ -78,3 +78,13 @@ def update_todo(todo_id: int, todo: TODOUpdate, session: SessionDep):
     session.commit()
     session.refresh(todo_db)
     return todo_db
+
+# Delete a TODO
+@app.delete("/todos/{todo_id}")
+def delete_todo(todo_id: int, session: SessionDep):
+    todo = session.get(TODO, todo_id)
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    session.delete(todo)
+    session.commit()
+    return {"ok": True}
