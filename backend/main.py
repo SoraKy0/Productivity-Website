@@ -14,6 +14,13 @@ from database import engine
 from models import TODOCreate, TODOPublic, TODO, TODOUpdate
 from typing import Annotated
 from sqlalchemy import func
+from fastapi.middleware.cors import CORSMiddleware
+
+
+origins = [
+    "http://localhost:5173",
+]
+
 
 # Handle database setup on startup and cleanup on shutdown
 @asynccontextmanager
@@ -30,6 +37,13 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 app = FastAPI(lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Create a new TODO item in the database and return the saved record
 @app.post("/todos/", response_model=TODOPublic, status_code=201)
