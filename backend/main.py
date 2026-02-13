@@ -18,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 origins = [
-    "http://localhost:5173",
+    "http://localhost:5173", # This allows the frontend (running on localhost:5173) to make requests to backend API.
 ]
 
 
@@ -37,7 +37,8 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 app = FastAPI(lifespan=lifespan)
 
-app.add_middleware(
+# Enable CORS to allow your frontend (localhost:5173) to securely communicate with this API.
+app.add_middleware( 
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
